@@ -1,0 +1,66 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile MultiThreadApp",
+            "type": "shell",
+            "command": "C:\\Users\\maxxf\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-21.0.8.9-hotspot\\bin\\javac.exe -encoding UTF-8 MultiThreadApp.java OneClickLab2.java",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$javac"]
+        },
+        {
+            "label": "ВАНКЛИК: Запуск Лаб 2",
+            "type": "shell",
+            "command": "C:\\Users\\maxxf\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-21.0.8.9-hotspot\\bin\\java.exe OneClickLab2",
+            "dependsOn": "Compile MultiThreadApp",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Запустить GUI Приложение (MultiThreadApp)",
+            "type": "shell",
+            "command": "C:\\Users\\maxxf\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-21.0.8.9-hotspot\\bin\\java.exe MultiThreadApp",
+            "dependsOn": "Compile MultiThreadApp",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Запустить Бенчмарк CLI (--benchmark)",
+            "type": "shell",
+            "command": "C:\\Users\\maxxf\\AppData\\Local\\Programs\\Eclipse Adoptium\\jdk-21.0.8.9-hotspot\\bin\\java.exe MultiThreadApp --benchmark",
+            "dependsOn": "Compile MultiThreadApp",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Запустить Инспекцию Потоков jstack (Python)",
+            "type": "shell",
+            "command": "python test_jstack.py",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

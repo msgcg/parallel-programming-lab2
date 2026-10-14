@@ -1,13 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Random;
 import javax.imageio.ImageIO;
 
-// 1. Поток вычисления координат прямоугольника (наследование от Thread)
 class ComputeRects extends Thread {
     private MultiThreadApp parent;
     private volatile boolean going = true;
@@ -27,9 +24,7 @@ class ComputeRects extends Thread {
         while (going) {
             int w = Math.max(10, parent.getCanvasWidth() - 40);
             int h = Math.max(10, parent.getCanvasHeight() - 40);
-            int x = random.nextInt(w);
-            int y = random.nextInt(h);
-            parent.rectCoordinates(x, y);
+            parent.rectCoordinates(random.nextInt(w), random.nextInt(h));
             try {
                 Thread.sleep(60);
             } catch (InterruptedException e) {
@@ -39,7 +34,6 @@ class ComputeRects extends Thread {
     }
 }
 
-// 2. Поток вычисления координат овала (наследование от Thread)
 class ComputeOvals extends Thread {
     private MultiThreadApp parent;
     private volatile boolean going = true;
@@ -59,9 +53,7 @@ class ComputeOvals extends Thread {
         while (going) {
             int w = Math.max(10, parent.getCanvasWidth() - 40);
             int h = Math.max(10, parent.getCanvasHeight() - 40);
-            int x = random.nextInt(w);
-            int y = random.nextInt(h);
-            parent.ovalCoordinates(x, y);
+            parent.ovalCoordinates(random.nextInt(w), random.nextInt(h));
             try {
                 Thread.sleep(80);
             } catch (InterruptedException e) {
@@ -71,7 +63,6 @@ class ComputeOvals extends Thread {
     }
 }
 
-// 3. Поток вычисления координат линий (реализация интерфейса Runnable)
 class ComputeLines implements Runnable {
     private MultiThreadApp parent;
     private volatile boolean going = true;
@@ -88,11 +79,7 @@ class ComputeLines implements Runnable {
     public void compute() {
         int w = Math.max(10, parent.getCanvasWidth() - 10);
         int h = Math.max(10, parent.getCanvasHeight() - 10);
-        int x1 = random.nextInt(w);
-        int y1 = random.nextInt(h);
-        int x2 = random.nextInt(w);
-        int y2 = random.nextInt(h);
-        parent.lineCoordinates(x1, y1, x2, y2);
+        parent.lineCoordinates(random.nextInt(w), random.nextInt(h), random.nextInt(w), random.nextInt(h));
     }
 
     @Override
@@ -108,11 +95,10 @@ class ComputeLines implements Runnable {
     }
 }
 
-// Главный класс приложения
 public class MultiThreadApp extends JFrame {
-    private int m_rectX = 50, m_rectY = 50;
-    private int m_ovalX = 180, m_ovalY = 120;
-    private int m_lineX1 = 30, m_lineY1 = 200, m_lineX2 = 280, m_lineY2 = 80;
+    private int m_rectX = 60, m_rectY = 60;
+    private int m_ovalX = 220, m_ovalY = 140;
+    private int m_lineX1 = 40, m_lineY1 = 220, m_lineX2 = 320, m_lineY2 = 80;
 
     private ComputeRects m_rects = null;
     private ComputeOvals m_ovals = null;
@@ -124,29 +110,27 @@ public class MultiThreadApp extends JFrame {
     private JLabel statusLabel;
 
     public MultiThreadApp() {
-        super("Лабораторная работа №2: Потоки и процессы в Java (Эрденко М.Д., Разгуляев Е.О.)");
+        super("Лабораторная работа №2: Потоки и процессы в Java (Эрденко М.Д.)");
         setSize(780, 520);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Информационная панель сверху
         JPanel headerPanel = new JPanel(new GridLayout(2, 1));
         headerPanel.setBackground(new Color(235, 240, 248));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
-        
+
         JLabel titleLabel = new JLabel("Параллельное программирование: Многопоточная визуализация примитивов");
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         titleLabel.setForeground(new Color(20, 45, 90));
-        
+
         statusLabel = new JLabel("Группа потоков: main | Активные потоки: 0 | Состояние: Инициализация");
         statusLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        
+
         headerPanel.add(titleLabel);
         headerPanel.add(statusLabel);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Холст отрисовки
         canvasPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -154,29 +138,24 @@ public class MultiThreadApp extends JFrame {
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Очистка фона
                 g2d.setColor(new Color(250, 250, 252));
                 g2d.fillRect(0, 0, getWidth(), getHeight());
 
-                // Сетка координат
                 g2d.setColor(new Color(230, 235, 240));
                 for (int x = 0; x < getWidth(); x += 40) g2d.drawLine(x, 0, x, getHeight());
                 for (int y = 0; y < getHeight(); y += 40) g2d.drawLine(0, y, getWidth(), y);
 
-                // Отрисовка линии (зеленая)
                 g2d.setColor(new Color(40, 160, 60));
                 g2d.setStroke(new BasicStroke(3));
                 g2d.drawLine(m_lineX1, m_lineY1, m_lineX2, m_lineY2);
                 g2d.drawString("ComputeLines (Runnable)", Math.min(m_lineX1, m_lineX2) + 5, Math.min(m_lineY1, m_lineY2) - 5);
 
-                // Отрисовка прямоугольника (красный)
                 g2d.setColor(new Color(220, 50, 50));
                 g2d.fillRect(m_rectX, m_rectY, 32, 32);
                 g2d.setColor(new Color(150, 20, 20));
                 g2d.drawRect(m_rectX, m_rectY, 32, 32);
                 g2d.drawString("ComputeRects (Thread)", m_rectX, m_rectY - 6);
 
-                // Отрисовка овала (синий)
                 g2d.setColor(new Color(50, 100, 220));
                 g2d.fillOval(m_ovalX, m_ovalY, 34, 34);
                 g2d.setColor(new Color(20, 50, 150));
@@ -187,10 +166,9 @@ public class MultiThreadApp extends JFrame {
         canvasPanel.setPreferredSize(new Dimension(760, 380));
         add(canvasPanel, BorderLayout.CENTER);
 
-        // Панель управления снизу
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 8));
         controlPanel.setBackground(new Color(240, 242, 245));
-        
+
         JButton btnStart = new JButton("Запустить потоки");
         JButton btnStop = new JButton("Остановить потоки");
         JButton btnBench = new JButton("Тест вычислений");
@@ -213,7 +191,6 @@ public class MultiThreadApp extends JFrame {
         return canvasPanel.getHeight() > 0 ? canvasPanel.getHeight() : 360;
     }
 
-    // Синхронизированные методы для потокобезопасного обновления
     public synchronized void rectCoordinates(int x, int y) {
         this.m_rectX = x;
         this.m_rectY = y;
@@ -237,22 +214,21 @@ public class MultiThreadApp extends JFrame {
     public void startThreads() {
         if (m_rects == null || !m_rects.isAlive()) {
             m_customGroup = new ThreadGroup("RenderThreadGroup");
-            
+
             m_rects = new ComputeRects(this, m_customGroup, "Thread-Rectangles");
             m_rects.setPriority(Thread.NORM_PRIORITY);
             m_rects.start();
 
             m_ovals = new ComputeOvals(this, m_customGroup, "Thread-Ovals");
-            m_ovals.setPriority(Thread.NORM_PRIORITY + 2); // Повышенный приоритет
+            m_ovals.setPriority(Thread.NORM_PRIORITY + 2);
             m_ovals.start();
 
             m_linesRunnable = new ComputeLines(this);
             m_linesThread = new Thread(m_customGroup, m_linesRunnable, "Runnable-Lines");
-            m_linesThread.setPriority(Thread.NORM_PRIORITY - 1); // Пониженный приоритет
+            m_linesThread.setPriority(Thread.NORM_PRIORITY - 1);
             m_linesThread.start();
 
-            updateStatus("Потоки активны | Группа: " + m_customGroup.getName() + 
-                         " | Потоков в группе: " + m_customGroup.activeCount());
+            updateStatus("Потоки активны | Группа: " + m_customGroup.getName() + " | Потоков в группе: " + m_customGroup.activeCount());
             System.out.println("[МНОГОПОТОЧНОСТЬ] Запущены 3 вычислительных потока:");
             System.out.println("  1. " + m_rects.getName() + " (Приоритет: " + m_rects.getPriority() + ")");
             System.out.println("  2. " + m_ovals.getName() + " (Приоритет: " + m_ovals.getPriority() + ")");
@@ -287,13 +263,14 @@ public class MultiThreadApp extends JFrame {
         }
     }
 
-    // Тестирование производительности параллельных вычислений
     public static void runBenchmark() {
         System.out.println("\n=== ТЕСТ ПРОИЗВОДИТЕЛЬНОСТИ: ПАРАЛЛЕЛЬНЫЕ ВЫЧИСЛЕНИЯ ===");
         int totalElements = 40_000_000;
-        int[] threadCounts = {1, 2, 4, 8};
+        int[] threadCounts = {1, 2, 4, 8, 16};
+        long singleThreadTime = 0;
 
         for (int threads : threadCounts) {
+            System.out.printf("  [Тест] Вычисление в %2d поток(ов)... ", threads);
             long startTime = System.currentTimeMillis();
             Thread[] workerThreads = new Thread[threads];
             int chunkSize = totalElements / threads;
@@ -317,39 +294,36 @@ public class MultiThreadApp extends JFrame {
             }
 
             long elapsed = System.currentTimeMillis() - startTime;
-            System.out.printf("  Потоков: %d | Время вычисления: %4d мс | Элементов: %,d%n", threads, elapsed, totalElements);
+            if (threads == 1) singleThreadTime = elapsed;
+            double speedup = (double) singleThreadTime / Math.max(1, elapsed);
+            System.out.printf("готово за %4d мс | Ускорение: %.2fx%n", elapsed, speedup);
         }
         System.out.println("=========================================================\n");
     }
 
     public static void main(String[] args) {
-        // Проверка режима CLI / Headless
         if (args.length > 0 && args[0].equals("--benchmark")) {
             runBenchmark();
             return;
+        }
+
+        if (args.length > 1 && args[0].equals("--capture")) {
+            MultiThreadApp app = new MultiThreadApp();
+            app.pack();
+            app.setSize(780, 520);
+            app.startThreads();
+            try {
+                Thread.sleep(600);
+            } catch (InterruptedException ignored) {}
+            app.saveScreenshot(args[1]);
+            app.stopThreads();
+            System.exit(0);
         }
 
         SwingUtilities.invokeLater(() -> {
             MultiThreadApp app = new MultiThreadApp();
             app.setVisible(true);
             app.startThreads();
-
-            // Если передан флаг сохранения снимка экрана
-            if (args.length > 0 && args[0].equals("--capture")) {
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(1200);
-                        app.saveScreenshot("/home/maxim/Лабы/pp_labs/screenshots/lab2_fig1_gui.png");
-                        runBenchmark();
-                        Thread.sleep(800);
-                        app.stopThreads();
-                        System.exit(0);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        System.exit(1);
-                    }
-                }).start();
-            }
         });
     }
 }

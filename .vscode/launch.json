@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "1. ВАНКЛИК: Полная демонстрация Лаб 2 (Бенчмарк + GUI Окно)",
+            "request": "launch",
+            "mainClass": "OneClickLab2",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "PowerShell",
+            "name": "2. ВАНКЛИК: Прямой запуск без расширений (Терминал)",
+            "request": "launch",
+            "script": "${workspaceFolder}/0_ВАНКЛИК_ЗАПУСК.bat"
+        },
+        {
+            "type": "java",
+            "name": "3. GUI Окно: MultiThreadApp",
+            "request": "launch",
+            "mainClass": "MultiThreadApp",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "java",
+            "name": "4. Бенчмарк CLI: 40 млн оп. (--benchmark)",
+            "request": "launch",
+            "mainClass": "MultiThreadApp",
+            "args": "--benchmark",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "python",
+            "name": "5. Инспекция Потоков: test_jstack.py",
+            "request": "launch",
+            "program": "${workspaceFolder}/test_jstack.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}
